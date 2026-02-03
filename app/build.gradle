@@ -27,16 +27,18 @@ apply plugin: 'com.android.application'
 repositories {
     jcenter()
     mavenCentral()
+    // Pico Enterprise SDK (ToB Service)
+    maven { url 'https://artifacts-cn-beijing.volces.com/repository/picoxrtob/' }
 }
 
 android {
     compileSdkVersion 34
     defaultConfig {
         applicationId "com.hmdm.launcher"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 34
-        versionCode 15300
-        versionName "6.30"
+        versionCode 16000
+        versionName "7.00"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         dataBinding {
             enabled = true
@@ -177,4 +179,7 @@ dependencies {
     // JAX-B dependencies for JDK 9+
     implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
     implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+
+    // Pico Enterprise SDK (ToB Service) for VR device management
+    implementation 'com.picoxr.tobservice:tobservicelib:4.3.12'
 }

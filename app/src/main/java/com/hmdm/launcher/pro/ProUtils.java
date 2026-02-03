@@ -41,6 +41,7 @@ import com.hmdm.launcher.R;
 import com.hmdm.launcher.helper.SettingsHelper;
 import com.hmdm.launcher.json.ServerConfig;
 import com.hmdm.launcher.util.LegacyUtils;
+import com.hmdm.launcher.util.PicoEnterpriseUtils;
 import com.hmdm.launcher.util.RemoteLogger;
 import com.hmdm.launcher.util.Utils;
 
@@ -347,6 +348,13 @@ public class ProUtils {
             activity.startLockTask();
             Log.i(TAG, "Lock Task Mode started successfully");
 
+            // Pico VR device specific: Set MDM as the home launcher
+            // This ensures the home button returns to MDM, not Pico's default home
+            if (PicoEnterpriseUtils.isPicoDevice()) {
+                Log.d(TAG, "Pico device detected, configuring Pico launcher...");
+                PicoEnterpriseUtils.bindAndSetLauncher(activity, activity.getPackageName());
+            }
+
             // Now launch the kiosk app if it's different from the launcher
             if (kioskApp != null && !kioskApp.equals(activity.getPackageName())) {
                 Intent launchIntent = activity.getPackageManager().getLaunchIntentForPackage(kioskApp);
@@ -455,6 +463,12 @@ public class ProUtils {
         }
 
         try {
+            // Pico VR device specific: Reset launcher to Pico's default home
+            if (PicoEnterpriseUtils.isPicoDevice()) {
+                Log.d(TAG, "Pico device detected, resetting Pico launcher to default...");
+                PicoEnterpriseUtils.resetLauncherToDefault(activity);
+            }
+
             // Stop lock task mode
             activity.stopLockTask();
             Log.i(TAG, "Lock Task Mode stopped");
