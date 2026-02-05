@@ -113,6 +113,7 @@ import com.hmdm.launcher.util.AppInfo;
 import com.hmdm.launcher.util.CrashLoopProtection;
 import com.hmdm.launcher.util.DeviceInfoProvider;
 import com.hmdm.launcher.util.InstallUtils;
+import com.hmdm.launcher.util.PicoEnterpriseUtils;
 import com.hmdm.launcher.util.PreferenceLogger;
 import com.hmdm.launcher.util.RemoteLogger;
 import com.hmdm.launcher.util.SystemUtils;
@@ -331,6 +332,7 @@ public class MainActivity
     private int exitTapCount = 0;
     private ImageView infoView;
     private ImageView updateView;
+    private ImageView adminView;
 
     private View statusBarView;
     private View rightToolbarView;
@@ -952,6 +954,7 @@ public class MainActivity
         createExitButton();
         createInfoButton();
         createUpdateButton();
+        createAdminButton();
     }
 
     private void createButtons() {
@@ -1323,6 +1326,21 @@ public class MainActivity
         updateView = createManageButton(R.drawable.ic_system_update_opaque_24dp, R.drawable.ic_system_update_black_24dp,
                 (int)(2.05f * getResources().getDimensionPixelOffset(R.dimen.info_icon_margin)));
         updateView.setOnClickListener(this);
+    }
+
+    private void createAdminButton() {
+        // Only show admin button on PICO devices for easier access to admin panel
+        if (!PicoEnterpriseUtils.isPicoDevice()) {
+            return;
+        }
+        if (adminView != null) {
+            return;
+        }
+        adminView = createManageButton(R.drawable.ic_admin_settings_opaque_24dp, R.drawable.ic_admin_settings_black_24dp,
+                (int)(3.1f * getResources().getDimensionPixelOffset(R.dimen.info_icon_margin)));
+        adminView.setOnClickListener(view -> {
+            createAndShowEnterPasswordDialog();
+        });
     }
 
     // The userInteraction flag denotes whether the config has been updated from the UI or in the background
@@ -2015,6 +2033,11 @@ public class MainActivity
 
         if ( updateView != null ) {
             try { manager.removeView( updateView ); }
+            catch ( Exception e ) { e.printStackTrace(); }
+        }
+
+        if ( adminView != null ) {
+            try { manager.removeView( adminView ); }
             catch ( Exception e ) { e.printStackTrace(); }
         }
 
