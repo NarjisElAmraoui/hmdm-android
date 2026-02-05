@@ -19,6 +19,9 @@
 
 <resources>
     <string name="admin_title">Administrator</string>
+    <string name="exit_button">Admin</string>
+    <string name="info_button">Info</string>
+    <string name="update_button">Sync</string>
     <string name="install_error">Fehler beim Installieren</string>
     <string name="file_create_error">Fehler beim Erstellen der Datei</string>
     <string name="dialog_enter_device_id_error">Diese ID ist bei %s nicht registriert. Rufen Sie die ID auf der Registerkarte \"Geräte\" des Bedienfelds ab.</string>

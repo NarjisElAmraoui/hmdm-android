@@ -19,6 +19,9 @@
 
 <resources>
     <string name="admin_title">Amministratore</string>
+    <string name="exit_button">Admin</string>
+    <string name="info_button">Info</string>
+    <string name="update_button">Sincronizza</string>
     <string name="install_error">Errore durante l\'installazione</string>
     <string name="file_create_error">Errore durante la creazione del file</string>
     <string name="dialog_enter_device_id_error">Questo ID non è registrato su %s. Ottieni l\'ID dalla scheda \"Dispositivi\" del pannello di controllo.</string>

@@ -19,6 +19,9 @@
 
 <resources>
     <string name="admin_title">Quản trị viên</string>
+    <string name="exit_button">Quản trị</string>
+    <string name="info_button">Thông tin</string>
+    <string name="update_button">Đồng bộ</string>
     <string name="install_error">Lỗi cài đặt</string>
     <string name="file_create_error">Lỗi tạo file</string>
     <string name="dialog_enter_device_id_error">ID này chưa được đăng ký tại %s. Lấy ID từ tab \"Thiết bị\" trong bảng điều khiển.</string>

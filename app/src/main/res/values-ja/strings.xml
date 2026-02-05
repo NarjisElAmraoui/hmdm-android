@@ -19,6 +19,9 @@
 
 <resources>
     <string name="admin_title">管理者</string>
+    <string name="exit_button">管理</string>
+    <string name="info_button">情報</string>
+    <string name="update_button">同期</string>
     <string name="install_error">インストールエラー</string>
     <string name="file_create_error">ファイル作成エラー</string>
     <string name="dialog_enter_device_id_error">このIDは %s に登録されていません。コントロールパネルの\"端末\" タブからIDを取得して下さい。</string>

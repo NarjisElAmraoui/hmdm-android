@@ -21,6 +21,9 @@
     <string name="white_app_name" translatable="false">MDM Agent</string>
     <string name="app_name" translatable="false">Headwind MDM</string>
     <string name="admin_title">Administrator</string>
+    <string name="exit_button">Admin</string>
+    <string name="info_button">Info</string>
+    <string name="update_button">Sync</string>
     <string name="vendor" translatable="false">h-mdm.com</string>
     <string name="install_error">Error installing</string>
     <string name="file_create_error">Error creating file</string>

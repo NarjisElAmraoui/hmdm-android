@@ -28,8 +28,8 @@
         <variable name="fileLength" type="Long"/>
         <variable name="downloadedLength" type="Long"/>
     </data>
-    
-    <RelativeLayout 
+
+    <RelativeLayout
         android:id="@+id/activity_main"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -156,6 +156,65 @@
             </RelativeLayout>
 
         </RelativeLayout>
+
+        <!-- Modern Admin Toolbar - Outside content wrapper so always visible -->
+        <LinearLayout
+            android:id="@+id/admin_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/toolbar_button_background"
+            android:elevation="4dp">
+
+            <!-- Exit/Password Button -->
+            <ImageView
+                android:id="@+id/toolbar_btn_exit"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_toolbar_key_48dp"
+                android:background="@drawable/toolbar_button_background"
+                android:focusable="true"
+                android:clickable="true"
+                android:contentDescription="@string/exit_button"/>
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="1dp"/>
+
+            <!-- Info Button -->
+            <ImageView
+                android:id="@+id/toolbar_btn_info"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_toolbar_info_48dp"
+                android:background="@drawable/toolbar_button_background"
+                android:focusable="true"
+                android:clickable="true"
+                android:contentDescription="@string/info_button"/>
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="1dp"/>
+
+            <!-- Sync/Update Button -->
+            <ImageView
+                android:id="@+id/toolbar_btn_sync"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_toolbar_sync_48dp"
+                android:background="@drawable/toolbar_button_background"
+                android:focusable="true"
+                android:clickable="true"
+                android:contentDescription="@string/update_button"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

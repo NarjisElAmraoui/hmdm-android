@@ -113,7 +113,6 @@ import com.hmdm.launcher.util.AppInfo;
 import com.hmdm.launcher.util.CrashLoopProtection;
 import com.hmdm.launcher.util.DeviceInfoProvider;
 import com.hmdm.launcher.util.InstallUtils;
-import com.hmdm.launcher.util.PicoEnterpriseUtils;
 import com.hmdm.launcher.util.PreferenceLogger;
 import com.hmdm.launcher.util.RemoteLogger;
 import com.hmdm.launcher.util.SystemUtils;
@@ -326,13 +325,11 @@ public class MainActivity
         }
     };
 
-    private GradientDrawable selectedManageButtonBorder = new GradientDrawable();
-    private ImageView exitView;
-    private long exitFirstTapTime = 0;
-    private int exitTapCount = 0;
-    private ImageView infoView;
-    private ImageView updateView;
-    private ImageView adminView;
+    // XML-based toolbar buttons
+    private ImageView toolbarBtnExit;
+    private ImageView toolbarBtnInfo;
+    private ImageView toolbarBtnSync;
+    private View adminToolbar;
 
     private View statusBarView;
     private View rightToolbarView;
@@ -394,6 +391,9 @@ public class MainActivity
 
         settingsHelper = SettingsHelper.getInstance(this);
         preferences = getSharedPreferences(Const.PREFERENCES, MODE_PRIVATE);
+
+        // Setup bottom toolbar early so it's visible immediately
+        setupToolbar();
 
         if ("".equals(settingsHelper.getDeviceId()) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AdminReceiver.updateSettingsFromFile(this);
@@ -950,14 +950,7 @@ public class MainActivity
         return ProUtils.checkAccessibilityService(this);
     }
 
-    private void createLauncherButtons() {
-        createExitButton();
-        createInfoButton();
-        createUpdateButton();
-        createAdminButton();
-    }
-
-    private void createButtons() {
+    private void createKioskOverlay() {
         ServerConfig config = settingsHelper.getConfig();
         if (ProUtils.kioskModeRequired(this) && !getPackageName().equals(settingsHelper.getConfig().getMainApp())) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
@@ -968,7 +961,6 @@ public class MainActivity
                         getString(R.string.white_app_name)), Toast.LENGTH_LONG).show();
                 config.setKioskMode(false);
                 settingsHelper.updateConfig(config);
-                createLauncherButtons();
                 return;
             }
             View kioskUnlockButton = null;
@@ -992,13 +984,12 @@ public class MainActivity
                     }
                 });
             }
-        } else {
-            createLauncherButtons();
         }
+        // Toolbar is already setup in onCreate via setupToolbar()
     }
 
     private void startLauncher() {
-        createButtons();
+        createKioskOverlay();
 
         if (configUpdater.isPendingAppInstall()) {
             // Here we go after completing the user confirmed app installation
@@ -1252,95 +1243,80 @@ public class MainActivity
         return true;
     }
 
-    private ImageView createManageButton(int imageResource, int imageResourceBlack, int offset) {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-        int offsetRight = 0;
-        if (settingsHelper != null && settingsHelper.getConfig() != null && settingsHelper.getConfig().getLockStatusBar() != null && settingsHelper.getConfig().getLockStatusBar()) {
-            // If we lock the right bar, let's shift buttons to avoid overlapping
-            offsetRight = getResources().getDimensionPixelOffset(R.dimen.prevent_applications_list_width);
-        }
-
-        RelativeLayout view = new RelativeLayout(this);
-        // Offset is multiplied by 2 because the view is centered. Yeah I know its an Induism)
-        view.setPadding(0, offset * 2, offsetRight, 0);
-        view.setLayoutParams(layoutParams);
-
-        ImageView manageButton = new ImageView( this );
-        manageButton.setImageResource(isDarkBackground() ? imageResource : imageResourceBlack);
-        view.addView(manageButton);
-
-        selectedManageButtonBorder.setColor(0); // transparent background
-        selectedManageButtonBorder.setStroke(2, isDarkBackground() ? 0xa0ffffff : 0xa0000000); // white or black border with some transparency
-        manageButton.setOnFocusChangeListener((v, hasFocus) -> {
-            v.setBackground(hasFocus ? selectedManageButtonBorder : null);
-        });
-
-        try {
-            RelativeLayout root = findViewById(R.id.activity_main);
-            root.addView(view);
-        } catch ( Exception e ) { e.printStackTrace(); }
-        return manageButton;
-    }
-
-    private void createExitButton() {
-        if ( exitView != null ) {
+    /**
+     * Sets up the modern XML-based bottom toolbar.
+     * This toolbar is always visible, including in kiosk mode.
+     */
+    private void setupToolbar() {
+        if (adminToolbar != null) {
+            // Already setup
             return;
         }
-        exitView = createManageButton(R.drawable.ic_vpn_key_opaque_24dp, R.drawable.ic_vpn_key_black_24dp, 0);
-        exitView.setOnClickListener(view -> {
-            if (view.hasFocus()) {
-                // 6 subsequent taps within 3 secs open the hidden password view
-                long now = System.currentTimeMillis();
-                if (exitFirstTapTime < now - 3000) {
-                    exitFirstTapTime = now;
-                    exitTapCount = 1;
-                } else {
-                    exitTapCount++;
-                    if (exitTapCount >= 6) {
-                        exitFirstTapTime = 0;
-                        exitTapCount = 0;
-                        createAndShowEnterPasswordDialog();
-                    }
-                }
-            }
-        });
-        exitView.setOnLongClickListener(this);
-    }
 
-    private void createInfoButton() {
-        if ( infoView != null ) {
-            return;
-        }
-        infoView = createManageButton(R.drawable.ic_info_opaque_24dp, R.drawable.ic_info_black_24dp,
-                getResources().getDimensionPixelOffset(R.dimen.info_icon_margin));
-        infoView.setOnClickListener(this);
-    }
+        adminToolbar = findViewById(R.id.admin_toolbar);
+        toolbarBtnExit = findViewById(R.id.toolbar_btn_exit);
+        toolbarBtnInfo = findViewById(R.id.toolbar_btn_info);
+        toolbarBtnSync = findViewById(R.id.toolbar_btn_sync);
 
-    private void createUpdateButton() {
-        if ( updateView != null ) {
+        if (adminToolbar == null) {
             return;
         }
-        updateView = createManageButton(R.drawable.ic_system_update_opaque_24dp, R.drawable.ic_system_update_black_24dp,
-                (int)(2.05f * getResources().getDimensionPixelOffset(R.dimen.info_icon_margin)));
-        updateView.setOnClickListener(this);
-    }
 
-    private void createAdminButton() {
-        // Only show admin button on PICO devices for easier access to admin panel
-        if (!PicoEnterpriseUtils.isPicoDevice()) {
-            return;
-        }
-        if (adminView != null) {
-            return;
-        }
-        adminView = createManageButton(R.drawable.ic_admin_settings_opaque_24dp, R.drawable.ic_admin_settings_black_24dp,
-                (int)(3.1f * getResources().getDimensionPixelOffset(R.dimen.info_icon_margin)));
-        adminView.setOnClickListener(view -> {
+        // Apply theme (dark/light background)
+        boolean darkBackground = isDarkBackground();
+        updateToolbarTheme(darkBackground);
+
+        // Setup click listeners
+        toolbarBtnExit.setOnClickListener(v -> {
             createAndShowEnterPasswordDialog();
         });
+        toolbarBtnExit.setOnLongClickListener(v -> {
+            createAndShowEnterPasswordDialog();
+            return true;
+        });
+
+        toolbarBtnInfo.setOnClickListener(v -> {
+            createAndShowInfoDialog();
+        });
+
+        toolbarBtnSync.setOnClickListener(v -> {
+            if (enterDeviceIdDialog != null && enterDeviceIdDialog.isShowing()) {
+                Log.i(Const.LOG_TAG, "Occasional update request when device info is entered, ignoring!");
+                return;
+            }
+            Log.i(Const.LOG_TAG, "updating config on request");
+            binding.loading.setVisibility(View.VISIBLE);
+            binding.setShowContent(false);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            updateConfig(true);
+        });
+    }
+
+    /**
+     * Updates toolbar icons and background based on theme.
+     */
+    private void updateToolbarTheme(boolean darkBackground) {
+        if (toolbarBtnExit == null) {
+            return;
+        }
+
+        if (darkBackground) {
+            toolbarBtnExit.setImageResource(R.drawable.ic_toolbar_key_48dp);
+            toolbarBtnInfo.setImageResource(R.drawable.ic_toolbar_info_48dp);
+            toolbarBtnSync.setImageResource(R.drawable.ic_toolbar_sync_48dp);
+            toolbarBtnExit.setBackgroundResource(R.drawable.toolbar_button_background);
+            toolbarBtnInfo.setBackgroundResource(R.drawable.toolbar_button_background);
+            toolbarBtnSync.setBackgroundResource(R.drawable.toolbar_button_background);
+            adminToolbar.setBackgroundResource(R.drawable.toolbar_button_background);
+        } else {
+            toolbarBtnExit.setImageResource(R.drawable.ic_toolbar_key_black_48dp);
+            toolbarBtnInfo.setImageResource(R.drawable.ic_toolbar_info_black_48dp);
+            toolbarBtnSync.setImageResource(R.drawable.ic_toolbar_sync_black_48dp);
+            toolbarBtnExit.setBackgroundResource(R.drawable.toolbar_button_background_light);
+            toolbarBtnInfo.setBackgroundResource(R.drawable.toolbar_button_background_light);
+            toolbarBtnSync.setBackgroundResource(R.drawable.toolbar_button_background_light);
+            adminToolbar.setBackgroundResource(R.drawable.toolbar_button_background_light);
+        }
     }
 
     // The userInteraction flag denotes whether the config has been updated from the UI or in the background
@@ -1750,6 +1726,7 @@ public class MainActivity
         updateTitle(config);
 
         statusBarUpdater.updateControlsState(config.isDisplayStatus(), isDarkBackground());
+        updateToolbarTheme(isDarkBackground());
 
         if (mainAppListAdapter == null || needRedrawContentAfterReconfigure) {
             needRedrawContentAfterReconfigure = false;
@@ -2018,26 +1995,6 @@ public class MainActivity
 
         if ( rightToolbarView != null ) {
             try { manager.removeView( rightToolbarView ); }
-            catch ( Exception e ) { e.printStackTrace(); }
-        }
-
-        if ( exitView != null ) {
-            try { manager.removeView( exitView ); }
-            catch ( Exception e ) { e.printStackTrace(); }
-        }
-
-        if ( infoView != null ) {
-            try { manager.removeView( infoView ); }
-            catch ( Exception e ) { e.printStackTrace(); }
-        }
-
-        if ( updateView != null ) {
-            try { manager.removeView( updateView ); }
-            catch ( Exception e ) { e.printStackTrace(); }
-        }
-
-        if ( adminView != null ) {
-            try { manager.removeView( adminView ); }
             catch ( Exception e ) { e.printStackTrace(); }
         }
 
@@ -2648,25 +2605,13 @@ public class MainActivity
 
     @Override
     public boolean onLongClick( View v ) {
-        createAndShowEnterPasswordDialog();
-        return true;
+        // Toolbar button long clicks are handled by their individual listeners in setupToolbar()
+        return false;
     }
 
     @Override
     public void onClick( View v ) {
-        if (v.equals(infoView)) {
-            createAndShowInfoDialog();
-        } else if (v.equals(updateView)) {
-            if (enterDeviceIdDialog != null && enterDeviceIdDialog.isShowing()) {
-                Log.i(Const.LOG_TAG, "Occasional update request when device info is entered, ignoring!");
-                return;
-            }
-            Log.i(Const.LOG_TAG, "updating config on request");
-            binding.loading.setVisibility(View.VISIBLE);
-            binding.setShowContent(false);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            updateConfig(true);
-        }
+        // Toolbar button clicks are handled by their individual click listeners in setupToolbar()
     }
 
     private void postDelayedSystemSettingDialog(final String message, final Intent settingsIntent) {

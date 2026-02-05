@@ -19,6 +19,9 @@
 
 <resources>
     <string name="admin_title">Yönetici</string>
+    <string name="exit_button">Yönetici</string>
+    <string name="info_button">Bilgi</string>
+    <string name="update_button">Senkronize</string>
 	<string name="install_error">Yükleme hatası</string>
 	<string name="file_create_error">Dosya oluşturma hatası</string>
 	<string name="dialog_enter_device_id_error">Bu kimlik %s adresinde kayıtlı değil. Kontrol panelinin \"Cihazlar\" sekmesinden kimliği alın.</string>
