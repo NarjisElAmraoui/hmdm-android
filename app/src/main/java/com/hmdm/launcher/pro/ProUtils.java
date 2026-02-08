@@ -334,6 +334,11 @@ public class ProUtils {
                 allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
             }
 
+            // Always whitelist Pico Business Settings on Pico devices
+            if (PicoEnterpriseUtils.isPicoDevice()) {
+                allowedPackages.add(Const.PICO_SETTINGS_PACKAGE_NAME);
+            }
+
             // Set lock task packages
             String[] packages = allowedPackages.toArray(new String[0]);
             dpm.setLockTaskPackages(adminComponent, packages);
@@ -443,6 +448,11 @@ public class ProUtils {
 
             if (enableSettings) {
                 allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
+            }
+
+            // Always whitelist Pico Business Settings on Pico devices
+            if (PicoEnterpriseUtils.isPicoDevice()) {
+                allowedPackages.add(Const.PICO_SETTINGS_PACKAGE_NAME);
             }
 
             String[] packages = allowedPackages.toArray(new String[0]);
