@@ -334,9 +334,14 @@ public class ProUtils {
                 allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
             }
 
-            // Always whitelist Pico Business Settings on Pico devices
+            // Always whitelist settings packages on Pico devices
             if (PicoEnterpriseUtils.isPicoDevice()) {
+                if (!allowedPackages.contains(Const.SETTINGS_PACKAGE_NAME)) {
+                    allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
+                }
                 allowedPackages.add(Const.PICO_SETTINGS_PACKAGE_NAME);
+                allowedPackages.add(Const.PICO_TOB_SERVICE_PACKAGE_NAME);
+                allowedPackages.add(Const.PERMISSION_CONTROLLER_PACKAGE_NAME);
             }
 
             // Set lock task packages
@@ -450,9 +455,14 @@ public class ProUtils {
                 allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
             }
 
-            // Always whitelist Pico Business Settings on Pico devices
+            // Always whitelist settings packages on Pico devices
             if (PicoEnterpriseUtils.isPicoDevice()) {
+                if (!allowedPackages.contains(Const.SETTINGS_PACKAGE_NAME)) {
+                    allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
+                }
                 allowedPackages.add(Const.PICO_SETTINGS_PACKAGE_NAME);
+                allowedPackages.add(Const.PICO_TOB_SERVICE_PACKAGE_NAME);
+                allowedPackages.add(Const.PERMISSION_CONTROLLER_PACKAGE_NAME);
             }
 
             String[] packages = allowedPackages.toArray(new String[0]);

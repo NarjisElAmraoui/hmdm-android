@@ -90,6 +90,8 @@ public class Const {
 
     public static final String SETTINGS_PACKAGE_NAME = "com.android.settings";
     public static final String PICO_SETTINGS_PACKAGE_NAME = "com.picovr.settings";
+    public static final String PICO_TOB_SERVICE_PACKAGE_NAME = "com.pvr.tobservice";
+    public static final String PERMISSION_CONTROLLER_PACKAGE_NAME = "com.android.permissioncontroller";
     public static final String GSF_PACKAGE_NAME = "com.google.android.gsf";
     public static final String SYSTEM_UI_PACKAGE_NAME = "com.android.systemui";
     public static final String KIOSK_BROWSER_PACKAGE_NAME = "com.hmdm.kiosk";
