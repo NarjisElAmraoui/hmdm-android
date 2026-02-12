@@ -24,7 +24,11 @@ import android.os.Build;
 import android.util.Log;
 
 import com.hmdm.launcher.Const;
+import android.os.RemoteException;
+
 import com.pvr.tobservice.ToBServiceHelper;
+import com.pvr.tobservice.enums.PBS_SystemFunctionSwitchEnum;
+import com.pvr.tobservice.interfaces.IIntCallback;
 import com.pvr.tobservice.interfaces.IToBServiceProxy;
 
 /**
@@ -129,6 +133,86 @@ public class PicoEnterpriseUtils {
             Log.w(TAG, "setLauncher: ToB Service not bound");
             return Integer.MAX_VALUE;
         }
+    }
+
+
+
+    /**
+     * Generic method to enforce a Pico system function switch.
+     * Checks the current state and only switches if there's a mismatch.
+     *
+     * @param context Application context
+     * @param switchEnum The PBS_SystemFunctionSwitchEnum value
+     * @param switchOrdinal The ordinal int for pbsSwitchSystemFunction
+     * @param enabled true to enable, false to disable
+     * @param label Human-readable label for logging
+     */
+    private static void enforceSystemSwitch(Context context, PBS_SystemFunctionSwitchEnum switchEnum,
+                                            int switchOrdinal, boolean enabled, String label) {
+        IToBServiceProxy binder = (IToBServiceProxy) ToBServiceHelper.getInstance().getServiceBinder();
+        if (binder != null) {
+            try {
+                // PBS_SwitchEnum: S_ON = 0, S_OFF = 1 but CurrentState: ON = 1, OFF = 0
+                int pbsSwitchValue = enabled ? 0 : 1;
+                int desiredState = enabled ? 1 : 0;
+                binder.pbsGetSwitchSystemFunctionStatus(switchEnum, new IIntCallback.Stub() {
+                    @Override
+                    public void callback(int currentState) throws RemoteException {
+                        if (currentState != desiredState) {
+                            Log.i(TAG, label + " state mismatch: current=" + currentState + ", desired=" + desiredState + ". Switching.");
+                            try {
+                                binder.pbsSwitchSystemFunction(switchOrdinal, pbsSwitchValue, result -> {
+                                    Log.i(TAG, label + " set to " + enabled + ", result: " + result);
+                                    RemoteLogger.log(context, Const.LOG_INFO, "Pico " + label + " set to: " + enabled + ", result: " + result);
+                                }, 0);
+                            } catch (Exception e) {
+                                Log.e(TAG, label + " switch failed: " + e.getMessage());
+                            }
+                        }
+                    }
+                }, 0);
+            } catch (Exception e) {
+                Log.e(TAG, label + " status check failed: " + e.getMessage());
+            }
+        } else {
+            Log.w(TAG, "enforce " + label + ": ToB Service not bound");
+        }
+    }
+
+    /**
+     * Binds to the ToB Service and then sets 6DoF state.
+     *
+     * @param context Application context
+     * @param enabled true to enable 6DoF, false to disable
+     */
+    public static void bindAndSetSixDof(Context context, boolean enabled) {
+        bindService(context, () -> enforceSystemSwitch(context,
+                PBS_SystemFunctionSwitchEnum.SFS_SIX_DOF_SWITCH, 30, enabled, "6DOF"));
+
+    }
+
+    /**
+     * Binds to the ToB Service and enforces eye tracking state.
+     */
+    public static void bindAndSetEyeTracking(Context context, boolean enabled) {
+        bindService(context, () -> enforceSystemSwitch(context,
+                PBS_SystemFunctionSwitchEnum.SFS_EYE_TRACK, 79, enabled, "EyeTracking"));
+    }
+
+    /**
+     * Binds to the ToB Service and enforces hand tracking state.
+     */
+    public static void bindAndSetHandTracking(Context context, boolean enabled) {
+        bindService(context, () -> enforceSystemSwitch(context,
+                PBS_SystemFunctionSwitchEnum.SFS_GESTURE_RECOGNITION, 67, enabled, "HandTracking"));
+    }
+
+    /**
+     * Binds to the ToB Service and enforces dock bar (navigation) state.
+     */
+    public static void bindAndSetDockBar(Context context, boolean enabled) {
+        bindService(context, () -> enforceSystemSwitch(context,
+                PBS_SystemFunctionSwitchEnum.SFS_NAVGATION_SWITCH, 16, enabled, "DockBar"));
     }
 
     /**

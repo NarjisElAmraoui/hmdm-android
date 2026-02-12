@@ -17,6 +17,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.hmdm.launcher.Const;
 import com.hmdm.launcher.helper.SettingsHelper;
 import com.hmdm.launcher.json.ServerConfig;
+import com.hmdm.launcher.util.PicoEnterpriseUtils;
 import com.hmdm.launcher.util.Utils;
 
 import java.util.Timer;
@@ -184,6 +185,21 @@ public class StatusControlService extends Service {
                 } catch (Exception e) {
                     // Some problem access private API
                 }
+            }
+        }
+
+        if (PicoEnterpriseUtils.isPicoDevice()) {
+            if (config.getSixDof() != null) {
+                PicoEnterpriseUtils.bindAndSetSixDof(getApplicationContext(), config.getSixDof());
+            }
+            if (config.getEyeTracking() != null) {
+                PicoEnterpriseUtils.bindAndSetEyeTracking(getApplicationContext(), config.getEyeTracking());
+            }
+            if (config.getHandTracking() != null) {
+                PicoEnterpriseUtils.bindAndSetHandTracking(getApplicationContext(), config.getHandTracking());
+            }
+            if (config.getDockBar() != null) {
+                PicoEnterpriseUtils.bindAndSetDockBar(getApplicationContext(), config.getDockBar());
             }
         }
     }

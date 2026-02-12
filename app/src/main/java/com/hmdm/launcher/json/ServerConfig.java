@@ -44,6 +44,11 @@ public class ServerConfig {
     private Boolean wifi;
     private Boolean mobileData;
 
+    private Boolean sixDof;
+    private Boolean eyeTracking;
+    private Boolean handTracking;
+    private Boolean dockBar;
+
     private Boolean kioskMode;
     private String mainApp;
 
@@ -269,6 +274,38 @@ public class ServerConfig {
 
     public void setMobileData(Boolean mobileData) {
         this.mobileData = mobileData;
+    }
+
+    public Boolean getSixDof() {
+        return sixDof;
+    }
+
+    public void setSixDof(Boolean sixDof) {
+        this.sixDof = sixDof;
+    }
+
+    public Boolean getEyeTracking() {
+        return eyeTracking;
+    }
+
+    public void setEyeTracking(Boolean eyeTracking) {
+        this.eyeTracking = eyeTracking;
+    }
+
+    public Boolean getHandTracking() {
+        return handTracking;
+    }
+
+    public void setHandTracking(Boolean handTracking) {
+        this.handTracking = handTracking;
+    }
+
+    public Boolean getDockBar() {
+        return dockBar;
+    }
+
+    public void setDockBar(Boolean dockBar) {
+        this.dockBar = dockBar;
     }
 
     public Boolean getKioskMode() {
