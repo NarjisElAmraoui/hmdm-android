@@ -37,8 +37,8 @@ android {
         applicationId "com.hmdm.launcher"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 16000
-        versionName "7.00"
+        versionCode 16013
+        versionName "7.13"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         dataBinding {
             enabled = true
@@ -181,5 +181,5 @@ dependencies {
     implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
 
     // Pico Enterprise SDK (ToB Service) for VR device management
-    implementation 'com.picoxr.tobservice:tobservicelib:4.3.12'
+    implementation 'com.picoxr.tobservice:tobservicelib:4.3.14'
 }
