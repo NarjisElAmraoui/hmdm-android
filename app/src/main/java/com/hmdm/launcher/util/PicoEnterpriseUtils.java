@@ -158,6 +158,7 @@ public class PicoEnterpriseUtils {
                 binder.pbsGetSwitchSystemFunctionStatus(switchEnum, new IIntCallback.Stub() {
                     @Override
                     public void callback(int currentState) throws RemoteException {
+                        Log.i(TAG, label + " state : current=" + currentState + ", desired=" + desiredState + ".");
                         if (currentState != desiredState) {
                             Log.i(TAG, label + " state mismatch: current=" + currentState + ", desired=" + desiredState + ". Switching.");
                             try {
