@@ -117,13 +117,13 @@ public class PicoEnterpriseUtils {
      * @param packageName Package name of the launcher app
      * @return 0 on success, error code otherwise, Integer.MAX_VALUE if not bound
      */
-    public static int setLauncher(String packageName) {
+    public static int setLauncher(Context context, String packageName) {
         IToBServiceProxy binder = (IToBServiceProxy) ToBServiceHelper.getInstance().getServiceBinder();
         if (binder != null) {
             try {
                 int result = binder.setLauncher(packageName);
                 Log.i(TAG, "setLauncher(" + packageName + ") result: " + result);
-                RemoteLogger.log(null, Const.LOG_INFO, "Pico launcher set to: " + packageName + ", result: " + result);
+                RemoteLogger.log(context, Const.LOG_INFO, "Pico launcher set to: " + packageName + ", result: " + result);
                 return result;
             } catch (Exception e) {
                 Log.e(TAG, "setLauncher failed: " + e.getMessage());
@@ -225,7 +225,7 @@ public class PicoEnterpriseUtils {
      */
     public static void bindAndSetLauncher(Context context, String packageName) {
         bindService(context, () -> {
-            setLauncher(packageName);
+            setLauncher(context, packageName);
         });
     }
 
@@ -237,13 +237,13 @@ public class PicoEnterpriseUtils {
      */
     public static void resetLauncherToDefault(Context context) {
         // Pico's default launcher package
-        final String picoDefaultLauncher = "com.pvr.home";
+        final String picoDefaultLauncher = "com.pvr.vrshell";
 
         if (isServiceBound) {
-            setLauncher(picoDefaultLauncher);
+            setLauncher(context, picoDefaultLauncher);
         } else {
             bindService(context, () -> {
-                setLauncher(picoDefaultLauncher);
+                setLauncher(context, picoDefaultLauncher);
             });
         }
     }

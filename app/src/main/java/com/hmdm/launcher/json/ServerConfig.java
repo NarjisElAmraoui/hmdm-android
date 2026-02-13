@@ -50,6 +50,7 @@ public class ServerConfig {
     private Boolean dockBar;
 
     private Boolean kioskMode;
+    private Boolean kioskSettings;
     private String mainApp;
 
     private Boolean lockStatusBar;
@@ -318,6 +319,18 @@ public class ServerConfig {
 
     public void setKioskMode(Boolean kioskMode) {
         this.kioskMode = kioskMode;
+    }
+
+    public Boolean getKioskSettings() {
+        return kioskSettings;
+    }
+
+    public boolean isKioskSettings() {
+        return kioskSettings != null && kioskSettings;
+    }
+
+    public void setKioskSettings(Boolean kioskSettings) {
+        this.kioskSettings = kioskSettings;
     }
 
     public String getMainApp() {

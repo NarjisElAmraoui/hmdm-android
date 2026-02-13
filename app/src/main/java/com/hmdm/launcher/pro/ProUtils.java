@@ -330,15 +330,16 @@ public class ProUtils {
                 allowedPackages.add(kioskApp);
             }
 
-            if (enableSettings) {
+            ServerConfig config = SettingsHelper.getInstance(activity).getConfig();
+            boolean kioskSettingsEnabled = enableSettings ||
+                    (config != null && config.isKioskSettings());
+
+            if (kioskSettingsEnabled) {
                 allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
             }
 
-            // Always whitelist settings packages on Pico devices
-            if (PicoEnterpriseUtils.isPicoDevice()) {
-                if (!allowedPackages.contains(Const.SETTINGS_PACKAGE_NAME)) {
-                    allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
-                }
+            // Whitelist Pico-specific packages when settings are enabled
+            if (PicoEnterpriseUtils.isPicoDevice() && kioskSettingsEnabled) {
                 allowedPackages.add(Const.PICO_SETTINGS_PACKAGE_NAME);
                 allowedPackages.add(Const.PICO_TOB_SERVICE_PACKAGE_NAME);
                 allowedPackages.add(Const.PERMISSION_CONTROLLER_PACKAGE_NAME);
@@ -451,15 +452,16 @@ public class ProUtils {
                 allowedPackages.add(kioskApp);
             }
 
-            if (enableSettings) {
+            ServerConfig config = SettingsHelper.getInstance(activity).getConfig();
+            boolean kioskSettingsEnabled = enableSettings ||
+                    (config != null && config.isKioskSettings());
+
+            if (kioskSettingsEnabled) {
                 allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
             }
 
-            // Always whitelist settings packages on Pico devices
-            if (PicoEnterpriseUtils.isPicoDevice()) {
-                if (!allowedPackages.contains(Const.SETTINGS_PACKAGE_NAME)) {
-                    allowedPackages.add(Const.SETTINGS_PACKAGE_NAME);
-                }
+            // Whitelist Pico-specific packages when settings are enabled
+            if (PicoEnterpriseUtils.isPicoDevice() && kioskSettingsEnabled) {
                 allowedPackages.add(Const.PICO_SETTINGS_PACKAGE_NAME);
                 allowedPackages.add(Const.PICO_TOB_SERVICE_PACKAGE_NAME);
                 allowedPackages.add(Const.PERMISSION_CONTROLLER_PACKAGE_NAME);
