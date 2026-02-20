@@ -36,6 +36,7 @@ import com.hmdm.launcher.json.RemoteLogItem;
 import com.hmdm.launcher.pro.ProUtils;
 import com.hmdm.launcher.util.DeviceInfoProvider;
 import com.hmdm.launcher.util.RemoteLogger;
+import com.hmdm.launcher.p2p.P2PCommandClient;
 import com.hmdm.launcher.util.Utils;
 
 public class PluginApiService extends Service {
@@ -68,8 +69,8 @@ public class PluginApiService extends Service {
 
         @Override
         public int getVersion() {
-            // 1.1.7
-            return 117;
+            // 1.1.8
+            return 118;
         }
 
         @Override
@@ -182,6 +183,12 @@ public class PluginApiService extends Service {
         public void forceConfigUpdate() {
             // userInteraction is set to true so the applications are also updated unrelated from the app update schedule
             ConfigUpdater.forceConfigUpdate(PluginApiService.this, null, true);
+        }
+
+        @Override
+        public String sendP2PCommand(String commandJson) {
+            // Called on a binder thread — blocking I/O is safe here
+            return P2PCommandClient.sendCommand(PluginApiService.this, commandJson);
         }
     };
 }

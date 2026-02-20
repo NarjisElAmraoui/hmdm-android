@@ -216,6 +216,25 @@ public class HeadwindMDM {
         }
     }
 
+    /**
+     * Send a P2P command to the peer HMDM device over WiFi Direct.
+     * Blocking — call from a background thread only.
+     * Returns the response JSON string, or null on error (check getMdmAgentError()).
+     */
+    public String sendP2PCommand(String commandJson) {
+        if (!mdmConnected) {
+            return null;
+        }
+        try {
+            mdmAgentError = 0;
+            return mdmService.sendP2PCommand(commandJson);
+        } catch (MDMException e) {
+            mdmAgentError = e.mdmError.code;
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public boolean setCustom(int number, String value) {
         if (!mdmConnected) {
             return false;

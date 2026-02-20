@@ -52,4 +52,12 @@ interface IMdmApi {
      * Force the configuration update
      */
     void forceConfigUpdate();
+
+    // Added in library version 1.1.8
+    /**
+     * Send a JSON command to a WiFi Direct P2P peer HMDM instance.
+     * Synchronous and blocking — must NOT be called from the main thread.
+     * Returns the peer's JSON response, or a JSON error string on failure.
+     */
+    String sendP2PCommand(String commandJson);
 }

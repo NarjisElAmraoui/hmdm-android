@@ -146,6 +146,22 @@ public class MDMService {
     }
 
     /**
+     * Send a JSON command to the P2P peer HMDM instance over WiFi Direct.
+     * Blocks until response is received or timeout occurs.
+     * Must be called from a background thread.
+     */
+    public String sendP2PCommand(String commandJson) throws MDMException {
+        if (mdmApi == null) {
+            throw new MDMException(MDMError.ERROR_DISCONNECTED);
+        }
+        try {
+            return mdmApi.sendP2PCommand(commandJson);
+        } catch (RemoteException e) {
+            throw new MDMException(MDMError.ERROR_INTERNAL);
+        }
+    }
+
+    /**
      * Query configuration
      */
     public Bundle queryConfig() throws MDMException {

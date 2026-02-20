@@ -70,6 +70,10 @@
         tools:ignore="ProtectedPermissions"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions"/>
+    <!-- WifiP2pManager requires NEARBY_WIFI_DEVICES on Android 13+ -->
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation"
+        android:minSdkVersion="33" />
 
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_AIRPLANE_MODE" />
     <uses-permission android:name="android.permission.MANAGE_DEVICE_POLICY_APPS_CONTROL" />
@@ -263,6 +267,9 @@
             android:exported="false"/>
 
         <service android:name=".service.StatusControlService"
+            android:exported="false"/>
+
+        <service android:name=".service.P2PService"
             android:exported="false"/>
 
         <service android:name=".service.PushLongPollingService"

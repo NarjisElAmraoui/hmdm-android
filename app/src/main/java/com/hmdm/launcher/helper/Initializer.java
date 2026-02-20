@@ -22,6 +22,7 @@ import com.hmdm.launcher.pro.service.CheckForegroundAppAccessibilityService;
 import com.hmdm.launcher.pro.service.CheckForegroundApplicationService;
 import com.hmdm.launcher.pro.worker.DetailedInfoWorker;
 import com.hmdm.launcher.service.PushLongPollingService;
+import com.hmdm.launcher.service.P2PService;
 import com.hmdm.launcher.service.StatusControlService;
 import com.hmdm.launcher.task.SendDeviceInfoTask;
 import com.hmdm.launcher.util.ConnectionWaiter;
@@ -152,6 +153,11 @@ public class Initializer {
         }
         try {
             context.startService(new Intent(context, StatusControlService.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            context.startService(new Intent(context, P2PService.class));
         } catch (Exception e) {
             e.printStackTrace();
         }

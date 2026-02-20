@@ -45,6 +45,10 @@ public class Const {
 
     public static long CONNECTION_TIMEOUT = 10000;
     public static long LONG_POLLING_READ_TIMEOUT = 300000;
+
+    // WiFi Direct P2P command channel
+    public static final int P2P_TCP_PORT       = 38765;
+    public static final int P2P_TCP_TIMEOUT_MS = 5000;
     public static final String STATUS_OK = "OK";
     public static final String ORIENTATION = "ORIENTATION";
     public static final String PACKAGE_NAME = "PACKAGE_NAME";
