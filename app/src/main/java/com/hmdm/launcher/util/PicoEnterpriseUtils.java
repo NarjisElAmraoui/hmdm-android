@@ -237,7 +237,7 @@ public class PicoEnterpriseUtils {
      */
     public static void resetLauncherToDefault(Context context) {
         // Pico's default launcher package
-        final String picoDefaultLauncher = "com.pvr.vrshell";
+        final String picoDefaultLauncher = "com.pvr.vrshell/.MainActivity";
 
         if (isServiceBound) {
             setLauncher(context, picoDefaultLauncher);

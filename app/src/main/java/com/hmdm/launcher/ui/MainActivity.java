@@ -105,6 +105,7 @@ import com.hmdm.launcher.server.ServerServiceKeeper;
 import com.hmdm.launcher.server.UnsafeOkHttpClient;
 import com.hmdm.launcher.service.LocationService;
 import com.hmdm.launcher.service.PluginApiService;
+import com.hmdm.launcher.service.P2PService;
 import com.hmdm.launcher.service.StatusControlService;
 import com.hmdm.launcher.task.GetServerConfigTask;
 import com.hmdm.launcher.task.SendDeviceInfoTask;
@@ -635,6 +636,7 @@ public class MainActivity
             startService(new Intent(MainActivity.this, CheckForegroundAppAccessibilityService.class));
         }
         startService(new Intent(MainActivity.this, StatusControlService.class));
+        startService(new Intent(MainActivity.this, P2PService.class));
 
         // Moved to onResume!
         // https://stackoverflow.com/questions/51863600/java-lang-illegalstateexception-not-allowed-to-start-service-intent-from-activ

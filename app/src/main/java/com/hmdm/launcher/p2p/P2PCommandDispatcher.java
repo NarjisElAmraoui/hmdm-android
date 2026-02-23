@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.hmdm.launcher.Const;
+import com.hmdm.launcher.helper.ConfigUpdater;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,10 +21,32 @@ public class P2PCommandDispatcher {
             case P2PCommand.TYPE_PING:
                 return buildOk(id);
 
-            // Future handlers will be added here:
-            // case P2PCommand.TYPE_CONNECT_WIFI:    return handleConnectWifi(context, request, id);
-            // case P2PCommand.TYPE_DISCONNECT_WIFI: return handleDisconnectWifi(context, id);
-            // case P2PCommand.TYPE_SYNC_CONFIG:     return handleSyncConfig(context, id);
+            case P2PCommand.TYPE_CONNECT_WIFI: {
+                JSONObject payload = request.optJSONObject(P2PCommand.FIELD_PAYLOAD);
+                if (payload == null) return buildError("MISSING_PAYLOAD", id);
+                String ssid = payload.optString("ssid", "");
+                String password = payload.optString("password", "");
+                if (ssid.isEmpty()) return buildError("MISSING_SSID", id);
+                // Respond OK immediately; execute async so P2P drop doesn't block response
+                new Thread(() -> {
+                    boolean initiated = WiFiConnector.connect(context, ssid, password);
+                    if (initiated && WiFiConnector.waitForConnection(context, ssid)) {
+                        Log.i(Const.LOG_TAG, "P2PCommandDispatcher: connected to " + ssid + ", triggering MDM sync");
+                        ConfigUpdater.forceConfigUpdate(context);
+                    } else {
+                        Log.w(Const.LOG_TAG, "P2PCommandDispatcher: failed to connect to " + ssid);
+                    }
+                }, "P2PWifiConnect").start();
+                return buildOk(id);
+            }
+
+            case P2PCommand.TYPE_DISCONNECT_WIFI:
+                new Thread(() -> WiFiConnector.disconnect(context), "P2PWifiDisconnect").start();
+                return buildOk(id);
+
+            case P2PCommand.TYPE_SYNC_CONFIG:
+                new Thread(() -> ConfigUpdater.forceConfigUpdate(context), "P2PSyncConfig").start();
+                return buildOk(id);
 
             default:
                 Log.w(Const.LOG_TAG, "P2PCommandDispatcher: unknown command type=" + type);

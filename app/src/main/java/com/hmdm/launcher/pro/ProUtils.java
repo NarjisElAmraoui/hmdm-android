@@ -485,12 +485,6 @@ public class ProUtils {
         }
 
         try {
-            // Pico VR device specific: Reset launcher to Pico's default home
-            if (PicoEnterpriseUtils.isPicoDevice()) {
-                Log.d(TAG, "Pico device detected, resetting Pico launcher to default...");
-                PicoEnterpriseUtils.resetLauncherToDefault(activity);
-            }
-
             // Stop lock task mode
             activity.stopLockTask();
             Log.i(TAG, "Lock Task Mode stopped");
