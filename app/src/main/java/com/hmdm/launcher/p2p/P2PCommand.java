@@ -2,9 +2,10 @@ package com.hmdm.launcher.p2p;
 
 public class P2PCommand {
     public static final String TYPE_PING            = "ping";
-    public static final String TYPE_CONNECT_WIFI    = "connectWifi";     // future
-    public static final String TYPE_DISCONNECT_WIFI = "disconnectWifi";  // future
-    public static final String TYPE_SYNC_CONFIG     = "syncConfig";      // future
+    public static final String TYPE_WIFI_SYNC       = "wifiSync";       // connect WiFi → sync MDM config → disconnect WiFi
+    public static final String TYPE_DISCONNECT_WIFI = "disconnectWifi";
+    public static final String TYPE_SYNC_CONFIG     = "syncConfig";
+    public static final String TYPE_GET_STATUS      = "getStatus";
 
     // Protocol field names
     public static final String FIELD_SECRET  = "secret";

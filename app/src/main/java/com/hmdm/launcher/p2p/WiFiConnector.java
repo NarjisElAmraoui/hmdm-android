@@ -12,7 +12,6 @@ import com.hmdm.launcher.Const;
 import com.hmdm.launcher.util.PicoEnterpriseUtils;
 import com.pvr.tobservice.ToBServiceHelper;
 import com.pvr.tobservice.interfaces.IBoolCallback;
-import com.pvr.tobservice.interfaces.IIntCallback;
 import com.pvr.tobservice.interfaces.IToBServiceProxy;
 
 import java.util.Collections;
@@ -32,6 +31,9 @@ public class WiFiConnector {
     // Generic path cleanup state
     private static volatile int addedNetworkId = -1;
     private static volatile WifiNetworkSuggestion addedSuggestion = null;
+
+    // Tracks the last SSID connected via connectPico() so disconnectPico() can remove it
+    private static volatile String lastConnectedSsid = null;
 
     /**
      * Initiates a connection to the given WPA2 network.
@@ -110,23 +112,15 @@ public class WiFiConnector {
                 return;
             }
             try {
-                // Step 1: connect immediately
+                // Connect immediately — no SetAutoConnect so the network is not persisted
+                // and the PICO will not auto-reconnect after we call disconnect()
                 int configResult = binder.pbsConfigWifi(ssid, password, 0);
                 Log.i(Const.LOG_TAG, TAG + ": pbsConfigWifi result=" + configResult
                         + " (0=success)");
-                success[0] = true;
-
-                // Step 2: persist auto-connect so PICO reconnects after a reboot
-                binder.pbsControlSetAutoConnectWIFIWithErrorCodeCallback(
-                        ssid, password, 0,
-                        new IIntCallback.Stub() {
-                            @Override
-                            public void callback(int result) throws RemoteException {
-                                Log.i(Const.LOG_TAG, TAG
-                                        + ": SetAutoConnectWIFI callback result=" + result
-                                        + " (0=success)");
-                            }
-                        });
+                if (configResult == 0) {
+                    success[0] = true;
+                    lastConnectedSsid = ssid;
+                }
             } catch (Exception e) {
                 Log.e(Const.LOG_TAG, TAG + ": PICO connectWifi error", e);
             }
@@ -175,12 +169,45 @@ public class WiFiConnector {
             Thread.currentThread().interrupt();
         }
 
-        // Drop the active connection at the Android WiFi level
+        // Drop the active connection and remove the saved network so the supplicant
+        // does not auto-reconnect. HMDM has device owner rights so removeNetwork() works
+        // even on API 29+ for networks we added via pbsConfigWifi.
         WifiManager wm = (WifiManager) context.getApplicationContext()
                 .getSystemService(Context.WIFI_SERVICE);
         if (wm != null) {
             wm.disconnect();
             Log.i(Const.LOG_TAG, TAG + ": WifiManager.disconnect() called");
+            removeSavedNetwork(wm, lastConnectedSsid);
+            lastConnectedSsid = null;
+        }
+    }
+
+    /**
+     * Finds the saved WifiConfiguration matching the given SSID and removes it,
+     * preventing the Android WiFi supplicant from auto-reconnecting.
+     */
+    @SuppressWarnings("deprecation")
+    private static void removeSavedNetwork(WifiManager wm, String ssid) {
+        if (ssid == null) return;
+        try {
+            java.util.List<android.net.wifi.WifiConfiguration> configs = wm.getConfiguredNetworks();
+            if (configs == null) {
+                Log.w(Const.LOG_TAG, TAG + ": getConfiguredNetworks() returned null");
+                return;
+            }
+            String quoted = "\"" + ssid + "\"";
+            for (android.net.wifi.WifiConfiguration config : configs) {
+                if (quoted.equals(config.SSID)) {
+                    boolean removed = wm.removeNetwork(config.networkId);
+                    wm.saveConfiguration();
+                    Log.i(Const.LOG_TAG, TAG + ": removeNetwork id=" + config.networkId
+                            + " ssid=" + ssid + " result=" + removed);
+                    return;
+                }
+            }
+            Log.w(Const.LOG_TAG, TAG + ": saved network not found for ssid=" + ssid);
+        } catch (Exception e) {
+            Log.e(Const.LOG_TAG, TAG + ": removeSavedNetwork error", e);
         }
     }
 
