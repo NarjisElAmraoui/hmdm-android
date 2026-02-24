@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gradlew :app:compileOpensourceDebugJavaWithJavac:*)",
+      "Bash(./gradlew:*)",
+      "Bash(dir \"C:\\\\HealthyMind\\\\Repositories\\\\PICO OpenXR SDK 3.0.0-20250422\" /s /b)",
+      "WebSearch",
+      "WebFetch(domain:business.picoxr.com)",
+      "Bash(dir:*)",
+      "Bash(dir \"%ANDROID_HOME%\\\\platforms\")",
+      "Bash(javap:*)",
+      "Bash(findstr:*)"
+    ]
+  }
+}

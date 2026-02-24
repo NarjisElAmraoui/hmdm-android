@@ -1,0 +1,103 @@
+@echo off
+  setlocal
+  if NOT "%UE_SDKS_ROOT%"=="" (call
+  %UE_SDKS_ROOT%\HostWin64\Android\SetupEnvironmentVars.bat)
+  set ANDROIDHOME=%ANDROID_HOME%
+  if "%ANDROIDHOME%"=="" set
+  ANDROIDHOME=C:/Users/narji/AppData/Local/Android/Sdk
+  set ADB=%ANDROIDHOME%\platform-tools\adb.exe
+  set DEVICE=
+  if not "%1"=="" set DEVICE=-s %1
+
+  set PACKAGE=com.hmdm.launcher
+  set APK_PATH=app-release.apk
+  set ADMIN_RECEIVER=%PACKAGE%/.AdminReceiver
+  set MAIN_ACTIVITY=%PACKAGE%/.ui.MainActivity
+
+  @echo.
+  @echo ============================================
+  @echo   Headwind MDM Installation Script
+  @echo ============================================
+  @echo.
+
+  @echo Checking device connection...
+  %ADB% %DEVICE% get-state >nul 2>&1
+  @if "%ERRORLEVEL%" NEQ "0" goto DeviceError
+
+  @echo.
+  @echo Uninstalling existing MDM application. Failures here can almost  
+  always be ignored.
+  %ADB% %DEVICE% uninstall %PACKAGE%
+
+  @echo.
+  @echo Installing MDM application. Failures here indicate a problem with
+   the device (connection or storage permissions) and are fatal.
+  %ADB% %DEVICE% install -r %APK_PATH%
+  @if "%ERRORLEVEL%" NEQ "0" goto InstallError
+
+  @echo.
+  @echo Verifying installation...
+  %ADB% %DEVICE% shell pm list packages | findstr %PACKAGE% >nul
+  @if "%ERRORLEVEL%" NEQ "0" goto InstallError
+
+  @echo.
+  @echo Setting device owner rights. Failure here may indicate accounts  
+  exist on device - factory reset recommended.
+  %ADB% %DEVICE% shell dpm set-device-owner %ADMIN_RECEIVER%
+  @if "%ERRORLEVEL%" NEQ "0" (
+      @echo.
+      @echo WARNING: Device owner setup failed. Checking if already      
+  set...
+      %ADB% %DEVICE% shell dumpsys device_policy | findstr "Device Owner"
+   >nul
+      @if "%ERRORLEVEL%" NEQ "0" (
+          @echo ERROR: Device owner not set. You may need to:
+          @echo   1. Factory reset the device, OR
+          @echo   2. Remove all accounts from the device
+          @echo.
+          @echo Continuing anyway - some features will not work without  
+  device owner rights.
+      ) else (
+          @echo Device owner was already set - continuing.
+      )
+  )
+
+  @echo.
+  @echo Granting special permissions...
+  %ADB% %DEVICE% shell appops set %PACKAGE% SYSTEM_ALERT_WINDOW allow    
+  %ADB% %DEVICE% shell appops set %PACKAGE% WRITE_SETTINGS allow
+
+  @echo.
+  @echo Starting MDM launcher...
+  %ADB% %DEVICE% shell am start -n %MAIN_ACTIVITY%
+
+  @echo.
+  @echo ============================================
+  @echo   Installation successful!
+  @echo ============================================
+  goto:eof
+
+  :DeviceError
+  @echo.
+  @echo ERROR: No device connected or device not responding.
+  @echo.
+  @echo Things to try:
+  @echo   - Check device is connected via USB
+  @echo   - Enable Developer Options and USB Debugging on device
+  @echo   - Run "%ADB% devices" to verify device is listed
+  @echo   - If multiple devices, pass device serial as argument:
+  install_mdm.bat DEVICE_SERIAL
+  @pause
+  goto:eof
+
+  :InstallError
+  @echo.
+  @echo ERROR: Installation failed.
+  @echo.
+  @echo Things to try:
+  @echo   - Check that %APK_PATH% exists in the current directory        
+  @echo   - Check device has enough storage space
+  @echo   - Check USB connection is stable
+  @echo   - Try: %ADB% %DEVICE% install -r -d %APK_PATH%
+  @pause
+  goto:eof
